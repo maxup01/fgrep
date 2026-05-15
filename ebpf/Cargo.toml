@@ -1,7 +1,22 @@
 [package]
 name = "ebpf"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
 
 [dependencies]
-aya-ebpf = { version = "0.1.0" }
+aya-ebpf = "0.1.1"
+
+[lib]
+test = false
+doctest = false
+
+[[bin]]
+name = "ebpf"
+path = "src/main.rs"
+test = false
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"

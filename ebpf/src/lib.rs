@@ -1,3 +1,5 @@
+#![no_std]
+
 #[repr(C)]
 pub struct PacketMetadata {
     pub src_ip: u32,
