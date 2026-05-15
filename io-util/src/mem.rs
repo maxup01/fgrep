@@ -1,7 +1,7 @@
 use std::{io, ptr, slice};
 
 #[repr(C)]
-pub struct XdpUmemReg {
+pub struct UmemReg {
     pub addr: u64,
     pub len: u64,
     pub chunk_size: u32,
@@ -14,13 +14,16 @@ pub struct Umem {
     pub data: &'static mut [u8],
     mem_ptr: *mut libc::c_void,
     len: usize,
+    chunk_size: usize,
 }
 
 impl Umem {
-    pub fn new(huge_pages_num: usize) -> Result<Self, io::Error> {
+    pub fn new(huge_pages_num: usize, chunk_size_kb: usize) -> Result<Self, io::Error> {
         const HUGE_PAGE_SIZE: usize = 1024 * 1024 * 2;
+        const CHUNK_BASE: usize = 1024;
 
         let len: usize = HUGE_PAGE_SIZE * huge_pages_num;
+        let chunk_size: usize = CHUNK_BASE * chunk_size_kb;
 
         let mmap_ptr = unsafe {
             libc::mmap(
@@ -43,9 +46,20 @@ impl Umem {
             data,
             mem_ptr: mmap_ptr,
             len,
+            chunk_size,
         };
 
         Ok(umem)
+    }
+
+    pub fn umem_reg(&self) -> UmemReg {
+        UmemReg {
+            addr: self.mem_ptr as u64,
+            len: self.len as u64,
+            chunk_size: self.chunk_size as u32,
+            headroom: 0,
+            flags: 0,
+        }
     }
 }
 
