@@ -1,5 +1,14 @@
 use std::{io, ptr, slice};
 
+#[repr(C)]
+pub struct XdpUmemReg {
+    pub addr: u64,
+    pub len: u64,
+    pub chunk_size: u32,
+    pub headroom: u32,
+    pub flags: u32,
+}
+
 #[allow(dead_code)]
 pub struct Umem {
     pub data: &'static mut [u8],
