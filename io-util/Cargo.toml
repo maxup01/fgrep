@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+error = { path = "../error" }
 aya = { version = "0.13.0" }
 aya-log = { version = "0.2.0" }
 libc = { version = "0.2.0" }

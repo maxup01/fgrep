@@ -5,3 +5,4 @@ edition = "2024"
 
 [dependencies]
 thiserror = { version = "2.0.0" }
+aya = { version = "0.13.0" }
