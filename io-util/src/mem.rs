@@ -39,3 +39,9 @@ impl Umem {
         Ok(umem)
     }
 }
+
+impl Drop for Umem {
+    fn drop(&mut self) {
+        unsafe { libc::munmap(self.mem_ptr, self.len) };
+    }
+}
