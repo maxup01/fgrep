@@ -1,11 +1,15 @@
 use crate::mem::UmemReg;
 use aya::{include_bytes_aligned, maps::XskMap, Ebpf};
 use error::NetcapError;
-use std::{io, mem};
+use std::{
+    io, mem,
+    os::fd::{FromRawFd, OwnedFd},
+};
 
 #[allow(unused)]
 pub(crate) struct EbpfProgram {
     ebpf: Ebpf,
+    socket_fd: Option<OwnedFd>,
 }
 
 impl EbpfProgram {
@@ -13,7 +17,10 @@ impl EbpfProgram {
         let ebpf =
             Ebpf::load(include_bytes_aligned!(env!("EBPF_PATH"))).map_err(NetcapError::Ebpf)?;
 
-        let ebpf_program = Self { ebpf };
+        let ebpf_program = Self {
+            ebpf,
+            socket_fd: None,
+        };
 
         Ok(ebpf_program)
     }
@@ -107,6 +114,7 @@ impl EbpfProgram {
         .map_err(NetcapError::XdpMap)?;
 
         xsk_map.set(0, socket_fd, 0)?;
+        self.socket_fd = Some(unsafe { OwnedFd::from_raw_fd(socket_fd) });
 
         Ok(())
     }
