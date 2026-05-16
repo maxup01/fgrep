@@ -65,6 +65,20 @@ impl EbpfProgram {
             return Err(NetcapError::Io(io::Error::last_os_error()));
         }
 
+        let result = unsafe {
+            libc::setsockopt(
+                socket_fd,
+                libc::SOL_XDP,
+                libc::XDP_RX_RING,
+                &ring_size as *const _ as *const libc::c_void,
+                mem::size_of::<u32>() as libc::socklen_t,
+            )
+        };
+
+        if result == -1 {
+            return Err(NetcapError::Io(io::Error::last_os_error()));
+        }
+
         let sxdp = libc::sockaddr_xdp {
             sxdp_family: libc::AF_XDP as u16,
             sxdp_flags: 0,
