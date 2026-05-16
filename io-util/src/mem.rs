@@ -1,5 +1,7 @@
 use std::{io, ptr, slice};
 
+use error::NetcapError;
+
 #[repr(C)]
 pub struct UmemReg {
     pub addr: u64,
@@ -18,7 +20,7 @@ pub struct Umem {
 }
 
 impl Umem {
-    pub fn new(huge_pages_num: usize, chunk_size_kb: usize) -> Result<Self, io::Error> {
+    pub fn new(huge_pages_num: usize, chunk_size_kb: usize) -> Result<Self, NetcapError> {
         const HUGE_PAGE_SIZE: usize = 1024 * 1024 * 2;
         const CHUNK_BASE: usize = 1024;
 
@@ -37,7 +39,7 @@ impl Umem {
         };
 
         if mmap_ptr == libc::MAP_FAILED {
-            return Err(io::Error::last_os_error());
+            return Err(NetcapError::Io(io::Error::last_os_error()));
         }
 
         let data = unsafe { slice::from_raw_parts_mut(mmap_ptr as *mut u8, len) };
