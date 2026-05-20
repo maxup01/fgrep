@@ -8,3 +8,4 @@ error = { path = "../error" }
 aya = { version = "0.13.0" }
 aya-log = { version = "0.2.0" }
 libc = { version = "0.2.0" }
+tokio = { version = "1.52.0", features = ["full"] }

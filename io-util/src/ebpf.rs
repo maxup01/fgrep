@@ -5,11 +5,11 @@ use std::{
     io, mem,
     os::fd::{FromRawFd, OwnedFd},
 };
+use tokio::io::unix::AsyncFd;
 
-#[allow(unused)]
 pub(crate) struct EbpfProgram {
     ebpf: Ebpf,
-    socket_fd: Option<OwnedFd>,
+    async_fd: Option<AsyncFd<OwnedFd>>,
 }
 
 impl EbpfProgram {
@@ -19,7 +19,7 @@ impl EbpfProgram {
 
         let ebpf_program = Self {
             ebpf,
-            socket_fd: None,
+            async_fd: None,
         };
 
         Ok(ebpf_program)
@@ -114,8 +114,16 @@ impl EbpfProgram {
         .map_err(NetcapError::XdpMap)?;
 
         xsk_map.set(0, socket_fd, 0)?;
-        self.socket_fd = Some(unsafe { OwnedFd::from_raw_fd(socket_fd) });
+
+        let socket_fd = unsafe { OwnedFd::from_raw_fd(socket_fd) };
+
+        let async_fd = AsyncFd::new(socket_fd).map_err(|err| NetcapError::Io(err))?;
+        self.async_fd = Some(async_fd);
 
         Ok(())
+    }
+
+    pub fn async_fd(&self) -> Option<&AsyncFd<OwnedFd>> {
+        self.async_fd.as_ref()
     }
 }
