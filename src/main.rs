@@ -1,6 +1,8 @@
 use clap::Parser;
-use fgrep::Cli;
+use fgrep::*;
 
 fn main() {
-    let _args = Cli::parse();
+    let args = Cli::parse();
+
+    Handler::run(args.path, args.pattern, args.ignore_case);
 }

@@ -3,11 +3,11 @@ use clap::Parser;
 #[derive(Parser)]
 #[command(name = "fgrep", about = "Search file paths by pattern")]
 pub struct Cli {
-    pattern: String,
+    pub pattern: String,
 
     #[arg(default_value = ".")]
-    path: String,
+    pub path: String,
 
     #[arg(short, long)]
-    ignore_case: bool,
+    pub ignore_case: bool,
 }
